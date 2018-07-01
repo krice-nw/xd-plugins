@@ -1,0 +1,16 @@
+{
+    "id": "com.krice.caaRenditions",
+    "name": "CAA Renditions",
+    "version": "1.0.0",
+    "host": {
+        "app": "XD",
+        "minVersion": "8.0"
+    },
+    "uiEntryPoints": [
+        {
+            "type": "menu",
+            "label": "CAA Renditions",
+            "commandId": "CAARenditionsCommnad"
+        }
+    ]
+}

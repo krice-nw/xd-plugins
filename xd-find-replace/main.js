@@ -21,7 +21,7 @@ function duplicateGroup(group, selection) {
             handleRepeatGrid(groupItem, selection);
         } else {
 
-            // crate a new node based on the group child
+            // create a new node based on the group child
             if (groupItem instanceof sg.Rectangle) {
                 newNode = new sg.Rectangle();
                 newNode.width = groupItem.width;
@@ -151,7 +151,7 @@ function handleRepeatGrid(repeatGrid, selection) {
 }
 
 function handleGroup(group, selection) {
-    // iterate through children, if no groups, repeat grios or text 
+    // iterate through children, if no groups, repeat grids or text 
     // simply return the group
     var problemChildren = group.children.filter(child => 
         child instanceof sg.Group || child instanceof sg.RepeatGrid || child instanceof sg.Text
@@ -163,7 +163,14 @@ function handleGroup(group, selection) {
         return group;
     }
 
+    // save the group name and transform to assign to the new group
     var groupName = group.name;
+    var groupTransform = group.transform;
+    // save the tranformation of each group child prior to ungroup so we can set them back 
+    // prior to creating the new group.
+    var childrenTransform = {};
+    // TODO: Try and use guid, more reliable than name
+    group.children.forEach(child => childrenTransform[child.name] = child.transform);
 
     selection.items = [group];
     cmd.ungroup();
@@ -177,12 +184,19 @@ function handleGroup(group, selection) {
     );
 
     nestedGroups.forEach(function(group) {
+        // TODO: Try to match the returned group to the previous group by guid
         groupItems.push(handleGroup(group, selection));
     });
 
+    // iterate over the groupItems and set their transform prior to creating the new group
+    // TODO: guid is better as it is unique, but new group children would be a challenge
+    groupItems.forEach(item => item.transform = childrenTransform[item.name]);
+
     selection.items = groupItems;
     cmd.group();
-    selection.items[0].name = groupName;
+    // assign the old name and transform
+    selection.items[0].name = groupName; 
+    selection.items[0].transform = groupTransform;
     // return the new group
     return selection.items[0];
 }
